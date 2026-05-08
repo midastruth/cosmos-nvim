@@ -59,37 +59,32 @@ cosmos.add_plugin('editorconfig/editorconfig-vim', {
 })
 
 cosmos.add_plugin('nvim-treesitter/nvim-treesitter', {
-  branch = 'master',
+  branch = 'main',
   lazy = false,
   build = function()
-    if #vim.api.nvim_list_uis() ~= 0 then
+    if #vim.api.nvim_list_uis() ~= 0 and vim.fn.executable('tree-sitter') == 1 then
       vim.cmd('TSUpdate')
     end
   end,
   config = configs.treesitter,
 })
-cosmos.add_plugin('nvim-treesitter/playground', {
-  dependencies = { 'nvim-treesitter/nvim-treesitter' },
-  event = 'BufRead',
-})
 cosmos.add_plugin('nvim-treesitter/nvim-treesitter-textobjects', {
+  branch = 'main',
   dependencies = { 'nvim-treesitter/nvim-treesitter' },
-  event = 'BufRead',
-})
-cosmos.add_plugin('RRethy/nvim-treesitter-textsubjects', {
-  dependencies = { 'nvim-treesitter/nvim-treesitter' },
-  event = 'BufRead',
+  config = configs.treesitter_textobjects,
+  event = { 'BufReadPost', 'BufNewFile' },
 })
 
 cosmos.add_plugin('JoosepAlviste/nvim-ts-context-commentstring', {
   dependencies = { 'nvim-treesitter/nvim-treesitter' },
-  event = 'BufRead',
+  event = { 'BufReadPost', 'BufNewFile' },
   config = configs.ts_context_commentstring,
 })
 
 cosmos.add_plugin('windwp/nvim-ts-autotag', {
   dependencies = { 'nvim-treesitter/nvim-treesitter' },
-  event = 'BufRead',
+  event = { 'BufReadPre', 'BufNewFile' },
+  config = configs.autotag,
 })
 
 cosmos.add_plugin('sheerun/vim-polyglot', {
@@ -276,7 +271,11 @@ cosmos.add_plugin('LintaoAmons/bookmarks.nvim', {
 })
 
 cosmos.add_plugin('ThePrimeagen/refactoring.nvim', {
-  dependencies = { 'nvim-lua/plenary.nvim', 'nvim-treesitter/nvim-treesitter' },
+  dependencies = {
+    'lewis6991/async.nvim',
+    'nvim-lua/plenary.nvim',
+    'nvim-treesitter/nvim-treesitter',
+  },
   config = configs.refactoring,
 })
 

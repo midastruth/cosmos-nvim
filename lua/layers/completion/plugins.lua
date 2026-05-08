@@ -149,6 +149,7 @@ local local_avante_dir = os.getenv('HOME') .. '/workspace/projects/avante.nvim'
 local local_avante_dir_exists = vim.fn.isdirectory(local_avante_dir) == 1
 
 cosmos.add_plugin('ravitemer/mcphub.nvim', {
+  enabled = false, -- paused: do not install/start MCPHub
   dev = true,
   dir = os.getenv('HOME') .. '/workspace/projects/mcphub.nvim',
   dependencies = {
@@ -189,27 +190,48 @@ cosmos.add_plugin('yetone/avante.nvim', {
   build = 'make',
   opts = {
     disabled_tools = { 'run_python' },
-    debug = true,
+    debug = false,
     mode = 'agentic',
     web_search_engine = {
       provider = 'serpapi',
     },
     rag_service = {
-      enabled = false, -- Enables the rag service, requires OPENAI_API_KEY to be set
-      provider = 'ollama',
-      llm_model = 'llama3.2',
-      embed_model = 'nomic-embed-text',
-      endpoint = 'http://10.0.0.244:11434',
+      enabled = false, -- Enables the RAG service
+      host_mount = os.getenv('HOME'),
+      runner = 'docker',
+      llm = {
+        provider = 'ollama',
+        endpoint = 'http://10.0.0.244:11434',
+        api_key = '',
+        model = 'llama3.2',
+        extra = nil,
+      },
+      embed = {
+        provider = 'ollama',
+        endpoint = 'http://10.0.0.244:11434',
+        api_key = '',
+        model = 'nomic-embed-text',
+        extra = nil,
+      },
+      docker_extra_args = '',
     },
     -- The system_prompt type supports both a string and a function that returns a string. Using a function here allows dynamically updating the prompt with mcphub
     system_prompt = function()
-      local hub = require('mcphub').get_hub_instance()
-      return hub:get_active_servers_prompt()
+      local ok, mcphub = pcall(require, 'mcphub')
+      if not ok then
+        return ''
+      end
+      local hub = mcphub.get_hub_instance()
+      return hub and hub:get_active_servers_prompt() or ''
     end,
     -- The custom_tools type supports both a list and a function that returns a list. Using a function here prevents requiring mcphub before it's loaded
     custom_tools = function()
+      local ok, avante_ext = pcall(require, 'mcphub.extensions.avante')
+      if not ok then
+        return {}
+      end
       return {
-        require('mcphub.extensions.avante').mcp_tool(),
+        avante_ext.mcp_tool(),
       }
     end,
     -- provider = 'copilot_gemini',
@@ -556,9 +578,9 @@ cosmos.add_plugin('yetone/avante.nvim', {
     {
       'MeanderingProgrammer/render-markdown.nvim',
       opts = {
-        file_types = { 'markdown' },
+        file_types = { 'markdown', 'Avante' },
       },
-      ft = { 'markdown' },
+      ft = { 'markdown', 'Avante' },
     },
   },
 })
