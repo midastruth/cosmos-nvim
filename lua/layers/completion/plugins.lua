@@ -81,35 +81,37 @@ cosmos.add_plugin('olimorris/codecompanion.nvim', {
       log_level = 'DEBUG',
     },
     adapters = {
-      openai = function()
-        return require('codecompanion.adapters').extend('openai', {
-          schema = {
-            model = {
-              default = 'gpt-4o',
+      http = {
+        openai = function()
+          return require('codecompanion.adapters').extend('openai', {
+            schema = {
+              model = {
+                default = 'gpt-4o',
+              },
             },
-          },
-        })
-      end,
-      ollama = function()
-        return require('codecompanion.adapters').extend('ollama', {
-          env = {
-            url = 'http://10.0.0.207:11434',
-            -- api_key = "OLLAMA_API_KEY",
-          },
-          headers = {
-            ['Content-Type'] = 'application/json',
-            -- ["Authorization"] = "Bearer ${api_key}",
-          },
-          schema = {
-            model = {
-              default = 'devstral:24b',
+          })
+        end,
+        ollama = function()
+          return require('codecompanion.adapters').extend('ollama', {
+            env = {
+              url = 'http://10.0.0.207:11434',
+              -- api_key = "OLLAMA_API_KEY",
             },
-          },
-          parameters = {
-            sync = true,
-          },
-        })
-      end,
+            headers = {
+              ['Content-Type'] = 'application/json',
+              -- ["Authorization"] = "Bearer ${api_key}",
+            },
+            schema = {
+              model = {
+                default = 'devstral:24b',
+              },
+            },
+            parameters = {
+              sync = true,
+            },
+          })
+        end,
+      },
     },
     strategies = {
       chat = {
