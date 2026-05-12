@@ -281,47 +281,21 @@ function configs.treesitter()
   vim.treesitter.language.register('tsx', 'typescriptreact')
   vim.treesitter.language.register('javascript', 'javascriptreact')
 
-  local filetypes = {
-    'bash',
-    'c',
-    'cpp',
-    'css',
-    'go',
-    'html',
-    'javascript',
-    'javascriptreact',
-    'json',
-    'lua',
-    'markdown',
-    'python',
-    'query',
-    'rust',
-    'sh',
-    'typescript',
-    'typescriptreact',
-    'vim',
-    'vimdoc',
-    'yaml',
-  }
-
   local function parser_available(lang)
     return #vim.api.nvim_get_runtime_file('parser/' .. lang .. '.*', false) > 0
   end
 
   vim.api.nvim_create_autocmd('FileType', {
     group = vim.api.nvim_create_augroup('cosmos_treesitter', { clear = true }),
-    pattern = filetypes,
     callback = function(args)
-      local lang = vim.treesitter.language.get_lang(vim.bo[args.buf].filetype)
+      local ft = vim.bo[args.buf].filetype
+      local lang = vim.treesitter.language.get_lang(ft)
+
       if not lang or not parser_available(lang) then
         return
       end
 
-      local loaded, err = vim.treesitter.language.add(lang)
-      if not loaded then
-        error(err or string.format('Failed to load treesitter parser for language "%s"', lang))
-      end
-
+      vim.treesitter.language.add(lang)
       vim.treesitter.start(args.buf, lang)
     end,
   })
