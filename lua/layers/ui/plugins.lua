@@ -87,7 +87,7 @@ cosmos.add_plugin('RRethy/vim-illuminate', {
   event = 'BufRead',
 })
 
-cosmos.add_plugin('norcalli/nvim-colorizer.lua', {
+cosmos.add_plugin('NvChad/nvim-colorizer.lua', {
   enabled = options.enable_colorizer,
   config = configs.colorizer,
   event = 'BufRead',
